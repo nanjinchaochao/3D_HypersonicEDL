@@ -201,10 +201,13 @@ fprintf('Adaption process finished \n');
 %% Generate accuracy histroy in terms of min and max number of samples
 tic;
 Num_min = min(Num_current_ensemble(:));
-Num_max = max(Num_current_ensemble(:));
-MCSAM(1).pseudo_min = mvnrnd(mu0, Covar0, Num_min);
-MCSAM(1).pseudo_min_w = mvnpdf(MCSAM(1).pseudo_min, mu0, Covar0);
+% MCSAM(1).pseudo_min = mvnrnd(mu0, Covar0, Num_min);
+% MCSAM(1).pseudo_min_w = mvnpdf(MCSAM(1).pseudo_min, mu0, Covar0);
+MCSAM(1).pseudo_min_isample = rand([Num_min, N]);
 for ntr = 1 : Num_min
+    MCSAM(1).pseudo_min(ntr, :) = icdf('Normal', MCSAM(1).pseudo_min_isample(ntr, :), mu0, sqrt(diag(Covar0))');
+    MCSAM(1).pseudo_min_w(ntr, :) = mvnpdf(MCSAM(1).pseudo_min(ntr, :), mu0, Covar0);
+    
     [MCSAM(1).pseudo_min_QoI(ntr, :), ~] = ChuteDeployment(MCSAM(1).pseudo_min(ntr, :));
     MCSAM(1).pseudo_min_ND(ntr, :) = MCSAM(1).pseudo_min(ntr, :)./NonD;
 end
@@ -239,18 +242,23 @@ end
 t_min = toc;
 
 tic;
-MCSAM(1).pseudo_max = mvnrnd(mu0, Covar0, Num_max);
-MCSAM(1).pseudo_max_w = mvnpdf(MCSAM(1).pseudo_max, mu0, Covar0);
+Num_max = max(Num_current_ensemble(:));
+% MCSAM(1).pseudo_max = mvnrnd(mu0, Covar0, Num_max);
+% MCSAM(1).pseudo_max_w = mvnpdf(MCSAM(1).pseudo_max, mu0, Covar0);
+MCSAM(1).pseudo_max_isample = rand([Num_max, N]);
 for ntr = 1 : Num_max
+    MCSAM(1).pseudo_max(ntr, :) = icdf('Normal', MCSAM(1).pseudo_max_isample(ntr, :), mu0, sqrt(diag(Covar0))');
+    MCSAM(1).pseudo_max_w(ntr, :) = mvnpdf(MCSAM(1).pseudo_max(ntr, :), mu0, Covar0);
+    
     [MCSAM(1).pseudo_max_QoI(ntr, :), ~] = ChuteDeployment(MCSAM(1).pseudo_max(ntr, :));
     MCSAM(1).pseudo_max_ND(ntr, :) = MCSAM(1).pseudo_max(ntr, :)./NonD;
 end
 Acc_pseudo_max(1) = BootstrapMean(MCSAM(1).pseudo_max_QoI, Num_resam_bootstrap);
 % Moment estimation
-Mean_max(1, :) = mean(MCSAM(1).pseudo_max);
-Std_max(1, :) = std(MCSAM(1).pseudo_max);
-Moment3_max(1, :) = moment(MCSAM(1).pseudo_max, 3);
-Moment4_max(1, :) = moment(MCSAM(1).pseudo_max, 4);
+% Mean_max(1, :) = mean(MCSAM(1).pseudo_max);
+% Std_max(1, :) = std(MCSAM(1).pseudo_max);
+% Moment3_max(1, :) = moment(MCSAM(1).pseudo_max, 3);
+% Moment4_max(1, :) = moment(MCSAM(1).pseudo_max, 4);
 
 for tctr = tctstart : tLEN
         for ctr = 1 : Num_max

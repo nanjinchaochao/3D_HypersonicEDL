@@ -54,14 +54,14 @@ options = odeset('RelTol', 1e-7, 'AbsTol', 1e-8);
 % P_Acc = 0.05;
 % Acc_UB = 0.1;       
 % Acc_LB = 0.01;
-P_Acc = 0.005;
-Acc_UB = 0.01;       
-Acc_LB = 0.001;
+% P_Acc = 0.005;
+% Acc_UB = 0.01;       
+% Acc_LB = 0.001;
 
 %%% Dynamics pressure
-% P_Acc = 0.5;
-% Acc_UB = 0.1;       
-% Acc_LB = 0.01;
+P_Acc = 0.5;
+Acc_UB = 0.1;       
+Acc_LB = 0.01;
 % % P_Acc = 0.05;
 % % Acc_UB = 0.01;       
 % % Acc_LB = 0.001;
@@ -89,6 +89,7 @@ U = lhsu(a, b, Num_start);                          % Generate uniform distribut
 for num = 1 : Num_start
     isample(num, :) = icdf('Normal', U(num, :), mu0, sqrt(diag(Covar0))');
     [QoI(num, 1) , ~] = ChuteDeployment(isample(num, :));
+    % QoI(num, 1) = Heating_Rate(isample(num, :));
     isample_ND(num, :) = isample(num, :)./NonD;
 end
 
@@ -149,6 +150,7 @@ for tctr = tctstart : tLEN
         MCSAM(tctr).sam(ctr, :) = MCSAM(tctr).sam_ND(ctr, :).*NonD;                 % Collect its associated pdf value at the current time
         MCSAM(tctr).w(ctr, 1) = x_ode(end, N + 1);
         [MCSAM(tctr).QoI(ctr, 1) , ~] = ChuteDeployment(MCSAM(tctr).sam(ctr, :));
+        % MCSAM(tctr).QoI(ctr, 1) = Heating_Rate(MCSAM(tctr).sam(ctr, :));
 %         if isnan(MCSAM(tctr).QoI(ctr, 1))
 %             aaa = 1;
 %         end
@@ -209,6 +211,7 @@ for ntr = 1 : Num_min
     MCSAM(1).pseudo_min_w(ntr, :) = mvnpdf(MCSAM(1).pseudo_min(ntr, :), mu0, Covar0);
     
     [MCSAM(1).pseudo_min_QoI(ntr, :), ~] = ChuteDeployment(MCSAM(1).pseudo_min(ntr, :));
+    % MCSAM(1).pseudo_min_QoI(ntr, :) = Heating_Rate(MCSAM(1).pseudo_min(ntr, :));
     MCSAM(1).pseudo_min_ND(ntr, :) = MCSAM(1).pseudo_min(ntr, :)./NonD;
 end
 Acc_pseudo_min(1) = BootstrapMean(MCSAM(1).pseudo_min_QoI, Num_resam_bootstrap);
@@ -226,6 +229,7 @@ for tctr = tctstart : tLEN
             MCSAM(tctr).pseudo_min_w(ctr, 1) = x_ode(end, N + 1); 
             MCSAM(tctr).pseudo_min(ctr, :) = MCSAM(tctr).pseudo_min_ND(ctr,:).*NonD;
             [MCSAM(tctr).pseudo_min_QoI(ctr, :), ~] = ChuteDeployment(MCSAM(tctr).pseudo_min(ctr, :));
+            % MCSAM(tctr).pseudo_min_QoI(ctr, :) = Heating_Rate(MCSAM(tctr).pseudo_min(ctr, :));
         end
 %         MCSAM(tctr).pseudo_minN = MCSAM(tctr).pseudo_min./repmat(NonDim, Num_min, 1);
 %         bootstat_pseudo_min = bootstrp(nboot, @mean, MCSAM(tctr).pseudo_minN);
@@ -251,6 +255,7 @@ for ntr = 1 : Num_max
     MCSAM(1).pseudo_max_w(ntr, :) = mvnpdf(MCSAM(1).pseudo_max(ntr, :), mu0, Covar0);
     
     [MCSAM(1).pseudo_max_QoI(ntr, :), ~] = ChuteDeployment(MCSAM(1).pseudo_max(ntr, :));
+    % MCSAM(1).pseudo_max_QoI(ntr, :) = Heating_Rate(MCSAM(1).pseudo_max(ntr, :));
     MCSAM(1).pseudo_max_ND(ntr, :) = MCSAM(1).pseudo_max(ntr, :)./NonD;
 end
 Acc_pseudo_max(1) = BootstrapMean(MCSAM(1).pseudo_max_QoI, Num_resam_bootstrap);
@@ -268,6 +273,7 @@ for tctr = tctstart : tLEN
             MCSAM(tctr).pseudo_max_w(ctr, 1) = x_ode(end, N + 1); 
             MCSAM(tctr).pseudo_max(ctr, :) = MCSAM(tctr).pseudo_max_ND(ctr,:).*NonD;
             [MCSAM(tctr).pseudo_max_QoI(ctr, :), ~] = ChuteDeployment(MCSAM(tctr).pseudo_max(ctr, :));
+            % MCSAM(tctr).pseudo_max_QoI(ctr, :) = Heating_Rate(MCSAM(tctr).pseudo_max(ctr, :));
         end
 %         MCSAM(tctr).pseudo_maxN = MCSAM(tctr).pseudo_max./repmat(NonDim, Num_max , 1);
 %         bootstat_pseudo_max = bootstrp(nboot, @mean, MCSAM(tctr).pseudo_maxN);
